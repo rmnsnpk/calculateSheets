@@ -1,0 +1,32 @@
+<form [formGroup]="form">
+  @if($showName()){
+    <mat-form-field>
+      <mat-label>Имя</mat-label>
+
+      <input
+        matInput
+        formControlName="name"
+      >
+
+    </mat-form-field>
+
+  }
+
+  <mat-form-field>
+    <mat-label>Ширина</mat-label>
+    <input
+      matInput
+      formControlName="width"
+      type="number"
+    >
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Вес</mat-label>
+    <input
+      matInput
+      formControlName="weight"
+      type="number"
+    >
+  </mat-form-field>
+</form>

@@ -1,0 +1,72 @@
+<div class="page">
+
+  <div class="canvas-container">
+    @for (row of calculatedRows; track row[0]){
+      <canvas #canvas [width]="canvasWidth" height="150"></canvas>
+    }
+  </div>
+
+  <form
+    [formGroup]="form"
+    class="form"
+  >
+
+    <app-figure-control
+      formControlName="sheetProps"
+      class="form__row__item"
+    />
+
+
+    <div class="sub-header">
+      <h2>Форматы</h2>
+
+      <button
+        mat-icon-button
+        (click)="addNewFigure()"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+
+      @if($canvases().length && showPrint){
+        <button
+          mat-icon-button
+          (click)="printCanvas()"
+        >
+          <mat-icon>print</mat-icon>
+        </button>
+      }
+    </div>
+
+    @for ( figureControl of form.controls.figures.controls;  let i = $index;  track i ) {
+      <div class="form__row">
+        <app-figure-control
+          [formControl]="figureControl"
+          [showName]="false"
+          class="form__row__item"
+        />
+
+        <button
+          mat-icon-button
+          (click)="removeFilter(i)"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <mat-hint>Вес одного среза: {{((figureControl.value.width * form.controls.sheetProps.value.weight / form.controls.sheetProps.value.width) / 5).toFixed(4)}}</mat-hint>
+    }
+
+
+    <button
+      mat-button
+      mat-raised-button
+      [disabled]="!form.valid"
+      (click)="calculate()"
+    >
+      Рассчитать
+    </button>
+  </form>
+
+
+
+</div>
