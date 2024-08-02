@@ -6,8 +6,6 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {IFigureProperty} from "../../models/figura-property.model";
 import {ISizeAmount} from "../../models/size-amount.model";
-import GLPKConstructor, {GLPK, LP} from 'glpk.js';
-import {F} from "@angular/cdk/keycodes";
 import {MatHint} from "@angular/material/form-field";
 
 @Component({
