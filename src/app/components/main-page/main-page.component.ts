@@ -1,12 +1,14 @@
 import {ChangeDetectorRef, Component, ElementRef, inject, viewChildren} from '@angular/core';
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
-import {ICalculatingForm} from "../../models/claculating-form.model";
+import {ICalculatingForm, ICalculatingFormValue} from "../../models/claculating-form.model";
 import {FigureControlComponent} from "../figure-control/figure-control.component";
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {IFigureProperty} from "../../models/figura-property.model";
 import {ISizeAmount} from "../../models/size-amount.model";
 import {MatHint} from "@angular/material/form-field";
+import {CutsService} from "../../services/cuts.service";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'app-main-page',
@@ -17,7 +19,8 @@ import {MatHint} from "@angular/material/form-field";
     MatIconButton,
     MatIcon,
     MatButton,
-    MatHint
+    MatHint,
+    MatTooltip
   ],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.scss'
@@ -30,13 +33,15 @@ export class MainPageComponent{
   public amounts: ISizeAmount[];
   public showPrint = false;
   private cdR = inject(ChangeDetectorRef);
+  private cutsService = inject(CutsService);
 
 
 
   public calculate() {
     this.calculatedRows = [];
-    this.amounts = this.calculateAmounts();
-    this.calculatedRows = this.cutSheetsOptimized(this.form.controls.sheetProps.value.width, this.amounts);
+    this.amounts = [];
+    this.amounts = this.cutsService.calculateAmounts(this.form.value as ICalculatingFormValue);
+    this.calculatedRows = this.cutsService.cutSheetsOptimized(this.form.controls.sheetProps.value.width, this.amounts);
     this.cdR.detectChanges();
 
     this.$canvases().forEach((canvas: { nativeElement: HTMLCanvasElement; }, index: string | number) => {
@@ -123,6 +128,10 @@ export class MainPageComponent{
     };
   }
 
+  public addOneFigureItem(formControl:  FormControl<IFigureProperty>, weightToBeAdded: number){
+    formControl.patchValue({...formControl.value, weight: formControl.value.weight + weightToBeAdded})
+  }
+
 
   private drawCanvas(canvas: HTMLCanvasElement, row: number[]) {
     const ctx = canvas.getContext('2d');
@@ -177,77 +186,7 @@ export class MainPageComponent{
   }
 
 
-  cutSheetsOptimized(sheetWidth: number, strips: ISizeAmount[]): number[][] {
-     const map = this.createWidthAmountMap(strips);
 
-     const combinations: number[][] = [];
-
-
-    while (Array.from(map.entries()).map((v)=>v[1]).some((v)=>v>0)){
-      const bestCombination = this.findBestCombination(map, sheetWidth)
-      combinations.push(bestCombination)
-
-      bestCombination.forEach((width)=>{
-        map.set(width, map.get(width) - 1)
-      })
-    }
-
-
-    console.log(combinations)
-
-    return combinations
-  }
-
-
-  private createWidthAmountMap(items: ISizeAmount[]): Map<number, number> {
-    const widthAmountMap = new Map<number, number>();
-
-    items.forEach(item => {
-      widthAmountMap.set(item.width, item.amount);
-    });
-
-    return widthAmountMap;
-  }
-
-  private findBestCombination(widthMap: Map<number, number>, maxWidth: number): number[] {
-    // Преобразуем карту в массив ширин и их количеств
-    const widths = Array.from(widthMap.entries());
-
-    // Создаем массив для хранения максимальных значений ширины для каждого возможного значения до maxWidth
-    const dp = new Array(maxWidth + 1).fill(0);
-    const selection = new Array(maxWidth + 1).fill(null).map(() => new Array<number>());
-
-    for (let [width, count] of widths) {
-      for (let w = maxWidth; w >= width; w--) {
-        for (let k = 1; k <= count; k++) {
-          if (w - k * width >= 0 && dp[w - k * width] + k * width > dp[w]) {
-            dp[w] = dp[w - k * width] + k * width;
-            selection[w] = [...selection[w - k * width], ...Array(k).fill(width)];
-          }
-        }
-      }
-    }
-
-    return selection[maxWidth];
-  }
-
-
-  private calculateAmounts(): ISizeAmount[]{
-    const v = this.form.value;
-    const rollWeight =v.sheetProps.weight;
-    const rollWidth =v.sheetProps.width;
-
-
-    return v.figures.map((figure)=>{
-      const amount = {
-        ...figure,
-        amount: Math.ceil(figure.weight / (figure.width * rollWeight / rollWidth / 5))
-      }
-
-      amount.weight = (figure.width * rollWeight / rollWidth) * amount.amount / 5
-      return amount
-    })
-  }
 }
 
 

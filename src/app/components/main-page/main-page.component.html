@@ -23,6 +23,7 @@
       <button
         mat-icon-button
         (click)="addNewFigure()"
+        [matTooltip]="'Добавить формат'"
       >
         <mat-icon>add</mat-icon>
       </button>
@@ -31,6 +32,7 @@
         <button
           mat-icon-button
           (click)="printCanvas()"
+          [matTooltip]="'Вывести на печать'"
         >
           <mat-icon>print</mat-icon>
         </button>
@@ -38,6 +40,7 @@
     </div>
 
     @for ( figureControl of form.controls.figures.controls;  let i = $index;  track i ) {
+      @let weightOfOneCut = (figureControl.value.width * form.controls.sheetProps.value.weight / form.controls.sheetProps.value.width) / 5
       <div class="form__row">
         <app-figure-control
           [formControl]="figureControl"
@@ -48,12 +51,23 @@
         <button
           mat-icon-button
           (click)="removeFilter(i)"
+          [matTooltip]="'Добавить 1 срез'"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+
+        <button
+          mat-icon-button
+          [matTooltip]="'Удалить формат'"
+          (click)="addOneFigureItem(figureControl, weightOfOneCut)"
         >
           <mat-icon>close</mat-icon>
         </button>
+
+
       </div>
 
-      <mat-hint>Вес одного среза: {{((figureControl.value.width * form.controls.sheetProps.value.weight / form.controls.sheetProps.value.width) / 5).toFixed(4)}}</mat-hint>
+      <mat-hint>Вес одного среза: {{weightOfOneCut.toFixed(4)}}</mat-hint>
     }
 
 

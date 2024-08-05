@@ -12,3 +12,8 @@ export interface ICalculatingFormItem{
   weight: FormControl<number>;
 }
 
+export interface ICalculatingFormValue {
+  sheetProps: IFigureProperty;
+  figures: IFigureProperty[];
+}
+
