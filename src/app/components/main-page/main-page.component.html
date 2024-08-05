@@ -40,7 +40,8 @@
     </div>
 
     @for ( figureControl of form.controls.figures.controls;  let i = $index;  track i ) {
-      @let weightOfOneCut = (figureControl.value.width * form.controls.sheetProps.value.weight / form.controls.sheetProps.value.width) / 5
+      @let weightOfOneCut = 6;
+
       <div class="form__row">
         <app-figure-control
           [formControl]="figureControl"
