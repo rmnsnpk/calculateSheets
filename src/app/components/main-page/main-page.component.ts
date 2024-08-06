@@ -157,7 +157,11 @@ export class MainPageComponent{
   }
 
   public addOneFigureItem(formControl:  FormControl<IFigureProperty>, weightToBeAdded: number){
-    formControl.patchValue({...formControl.value, weight: formControl.value.weight + weightToBeAdded})
+    weightToBeAdded = +weightToBeAdded.toFixed(4)+0.0001;
+    console.log('weightToBeAdded', weightToBeAdded)
+    console.log('formControl.value.weight % weightToBeAdded', formControl.value.weight % weightToBeAdded)
+    const oneCutWeight = weightToBeAdded - +(formControl.value.weight % weightToBeAdded).toFixed(4)+0.00001
+    formControl.patchValue({...formControl.value, weight: +(formControl.value.weight + oneCutWeight).toFixed(4)+0.00001})
   }
 
 
