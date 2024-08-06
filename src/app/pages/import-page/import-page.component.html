@@ -1,1 +1,21 @@
-<p>import-page works!</p>
+@if(!calculatingFormValues.length){
+  <app-file-input
+    (onFileInput)="fileInputChanged($event)"
+  >
+    <div>
+      Загрузить файл
+    </div>
+  </app-file-input>
+} @else {
+  <mat-tab-group>
+    @for (calculatingFormValue of calculatingFormValues; let i = $index; track i){
+      <mat-tab [label]="calculatingFormValue.sheetProps.name">
+        <app-main-page
+          [formValue]="calculatingFormValue"
+        >
+        </app-main-page>
+      </mat-tab>
+    }
+  </mat-tab-group>
+}
+

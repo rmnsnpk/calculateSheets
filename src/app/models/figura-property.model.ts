@@ -1,5 +1,5 @@
 export interface IFigureProperty{
-  name: string;
+  name?: string;
   width: number;
   weight: number;
 }

@@ -1,0 +1,17 @@
+<div
+  (click)='fileInput.click()'
+  (dragover)='$event.preventDefault()'
+  (drop)='onDrop($event)'
+  class='file-input-wrapper'
+>
+  <ng-content></ng-content>
+</div>
+
+<input
+  #fileInput
+  (change)="onFileChange($any($event.target)['files'])"
+  [ngStyle]="{'display': 'none'}"
+  [accept]='$acceptableTypes()'
+  type='file'
+/>
+

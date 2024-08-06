@@ -1,11 +1,14 @@
 <div class="page">
 
-  <div class="canvas-container">
-    @for (row of calculatedRows; track row[0]){
-      <canvas #canvas [width]="canvasWidth" height="150"></canvas>
-    }
-  </div>
 
+    <div class="canvas-container">
+      @if(showCanvases){
+        @for (row of calculatedRows; track row[0]){
+          <canvas #canvas [width]="canvasWidth" height="150"></canvas>
+        }
+      }
+
+    </div>
   <form
     [formGroup]="form"
     class="form"
@@ -40,7 +43,8 @@
     </div>
 
     @for ( figureControl of form.controls.figures.controls;  let i = $index;  track i ) {
-      @let weightOfOneCut = 6;
+
+      @let weightOfOneCut = ((figureControl.value.width * form.controls.sheetProps.value.weight / form.controls.sheetProps.value.width) / 5);
 
       <div class="form__row">
         <app-figure-control
@@ -51,7 +55,8 @@
 
         <button
           mat-icon-button
-          (click)="removeFilter(i)"
+          (click)="addOneFigureItem(figureControl, weightOfOneCut)"
+
           [matTooltip]="'Добавить 1 срез'"
         >
           <mat-icon>add</mat-icon>
@@ -60,7 +65,8 @@
         <button
           mat-icon-button
           [matTooltip]="'Удалить формат'"
-          (click)="addOneFigureItem(figureControl, weightOfOneCut)"
+          (click)="removeFilter(i)"
+
         >
           <mat-icon>close</mat-icon>
         </button>

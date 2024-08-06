@@ -1,4 +1,11 @@
 .container{
-  min-height: 100vh;
+  height: 100vh;
   background-color: aliceblue;
+  display: flex;
+  flex-direction: column;
+
+  .router-container{
+    display: block;
+    flex: 1;
+  }
 }

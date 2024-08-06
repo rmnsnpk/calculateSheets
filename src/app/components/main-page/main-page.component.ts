@@ -1,4 +1,13 @@
-import {ChangeDetectorRef, Component, ElementRef, inject, viewChildren} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Signal,
+  inject,
+  viewChildren,
+  input,
+  InputSignal, effect
+} from '@angular/core';
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {ICalculatingForm, ICalculatingFormValue} from "../../models/claculating-form.model";
 import {FigureControlComponent} from "../figure-control/figure-control.component";
@@ -26,15 +35,34 @@ import {MatTooltip} from "@angular/material/tooltip";
   styleUrl: './main-page.component.scss'
 })
 export class MainPageComponent{
+  $formValue: InputSignal<ICalculatingFormValue> = input({
+    sheetProps: {
+      name: '',
+      width: 4180,
+      weight: 16.5
+    },
+    figures:  [],
+  } as ICalculatingFormValue, {alias: 'formValue'})
   $canvases = viewChildren('canvas', {read: ElementRef<HTMLCanvasElement>});
   public form: FormGroup<ICalculatingForm> = this.initForm()
-  public calculatedRows : any[][];
+  public calculatedRows : number[][];
   public canvasWidth = 500;
   public amounts: ISizeAmount[];
   public showPrint = false;
+  public showCanvases = false;
   private cdR = inject(ChangeDetectorRef);
   private cutsService = inject(CutsService);
 
+
+  constructor() {
+    effect(() => {
+      this.form.controls.sheetProps.patchValue(this.$formValue().sheetProps)
+
+      this.$formValue().figures.forEach((figure)=>{
+        this.form.controls.figures.push(new FormControl(figure))
+      })
+    });
+  }
 
 
   public calculate() {
@@ -42,10 +70,10 @@ export class MainPageComponent{
     this.amounts = [];
     this.amounts = this.cutsService.calculateAmounts(this.form.value as ICalculatingFormValue);
     this.calculatedRows = this.cutsService.cutSheetsOptimized(this.form.controls.sheetProps.value.width, this.amounts);
+    this.showCanvases = true;
     this.cdR.detectChanges();
 
-    this.$canvases().forEach((canvas: { nativeElement: HTMLCanvasElement; }, index: string | number) => {
-      // @ts-ignore
+    this.$canvases().forEach((canvas: { nativeElement: HTMLCanvasElement; }, index:  number) => {
       this.drawCanvas(canvas.nativeElement, this.calculatedRows[index]);
     });
 
@@ -170,14 +198,16 @@ export class MainPageComponent{
     const form =  new FormGroup<ICalculatingForm>({
       sheetProps: new FormControl({
         name: '',
-        width: 4180,
-        weight: 16.5
+        width: 0,
+        weight: 0
       }),
       figures:  new FormArray<FormControl<IFigureProperty>>([]),
     })
 
+
     form.valueChanges.subscribe(()=>{
       this.showPrint = false;
+      this.showCanvases = false;
       this.cdR.markForCheck();
     })
 
